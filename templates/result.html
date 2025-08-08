@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SmartRecruitAI — Results</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="card">
+      <h1>Results — {{ filename }}</h1>
+
+      <section>
+        <h2>Recommended Titles</h2>
+        <ul>
+          {% for t in result.recommended_titles %}
+            <li>{{ t }} — confidence: {{ result.confidence_scores[t] }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section>
+        <h3>Highlights</h3>
+        <ul>
+          {% for h in result.highlights %}
+            <li>{{ h }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section>
+        <h4>Explanation</h4>
+        <p>{{ result.explanation }}</p>
+      </section>
+
+      <div style="margin-top:14px">
+        <a href="/">← Upload another resume</a>
+      </div>
+    </main>
+  </body>
+</html>

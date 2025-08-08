@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SmartRecruitAI — Upload Resume</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="card">
+      <h1>SmartRecruitAI</h1>
+      <p>Upload a resume (PDF / DOCX / TXT). We'll analyze and recommend job titles.</p>
+
+      {% if error %}
+      <div class="error">{{ error }}</div>
+      {% endif %}
+
+      <form action="/analyze" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".pdf,.doc,.docx,.txt" required />
+        <div style="margin-top:12px">
+          <button type="submit">Analyze Resume</button>
+        </div>
+      </form>
+
+      <footer style="margin-top:18px;font-size:13px;color:#666">Tip: For best results, use a text-based PDF or DOCX.</footer>
+    </main>
+  </body>
+</html>

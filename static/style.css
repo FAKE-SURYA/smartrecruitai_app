@@ -1,0 +1,7 @@
+:root { --bg: #f7fafc; --card:#ffffff; --muted:#6b7280 }
+body{font-family:Inter, system-ui, Arial; background:var(--bg); margin:0; padding:28px}
+.card{max-width:760px;margin:24px auto;padding:22px;background:var(--card);border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
+h1{margin:0 0 8px}
+button{background:#111;color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
+input[type=file]{padding:8px}
+.error{background:#fff1f2;color:#b91c1c;padding:8px;border-radius:6px}
