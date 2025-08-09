@@ -1,19 +1,27 @@
-# SmartRecruitAI (Pure-Python)
-Single-repo FastAPI app that analyzes resumes and recommends job titles.
+# SmartRecruitAI
 
-Features:
-- FastAPI + Jinja2 templates (no separate frontend)
-- Resume parsing (PDF, DOCX, TXT)
-- AI client: OpenAI ChatCompletion integration (if OPENAI_API_KEY set) + heuristic fallback
-- Optional sentence-transformers embedding-based ranking (if installed)
-- Unit tests and GitHub Actions CI workflow
+**SmartRecruitAI** is a dead-simple, beginner-friendly web app that lets you upload your resume and instantly get **AI-powered job suggestions**. All built in pure Python (FastAPI) – think of it as your first real tech portfolio project. 🚀
 
-Run (dev):
-```bash
-python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
-```
+**🌐 Live Demo:**  
+[https://smartrecruitaiapp-production-926c.up.railway.app](https://smartrecruitaiapp-production-926c.up.railway.app)
 
-To enable LLM responses, set environment variable `OPENAI_API_KEY` with your OpenAI API key.
+---
+
+## 🤔 What is this?
+
+Upload your resume (PDF, DOCX, or TXT), hit submit, and you’ll get a list of job titles that match your skills. The magic happens with a cloud AI behind the scenes (using Groq API).
+
+---
+
+## Features
+
+- **FastAPI** backend with Jinja2 templates (no JavaScript frontend needed)
+- **Resume parsing** for PDF, DOCX, and TXT
+- **AI powered:** Uses your Groq AI key for job recommendations
+- **No BS UI:** Just upload, see results, done!
+- **Beginner friendly, easy to deploy, clean code**
+
+---
+
+## Getting Started (Run Locally)
+
