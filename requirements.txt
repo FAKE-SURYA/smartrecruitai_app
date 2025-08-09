@@ -1,5 +1,5 @@
 fastapi
-uvicorn[standard]
+uvicorn
 jinja2
 python-multipart
 pydantic
@@ -7,7 +7,3 @@ PyPDF2
 python-docx
 httpx
 python-dotenv
-openai
-sentence-transformers  # optional: only needed if you enable embedding ranking
-pytest
-pytest-asyncio
