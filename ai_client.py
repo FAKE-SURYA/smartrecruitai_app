@@ -3,23 +3,22 @@ from typing import Dict, Any, List
 import httpx
 import logging
 
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-OPENAI_API_URL = os.getenv('OPENAI_API_URL', 'https://api.openai.com/v1/chat/completions')
+from dotenv import load_dotenv
+load_dotenv()
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+GROQ_API_URL = os.getenv('GROQ_API_URL', 'https://api.groq.com/openai/v1/chat/completions')
+print("GROQ_API_KEY loaded in ai_client.py:", GROQ_API_KEY)
 
-# Optional: if sentence-transformers is installed, we can use embedding-based ranking
-try:
-    from sentence_transformers import SentenceTransformer, util
-    _ST_MODEL = SentenceTransformer('all-MiniLM-L6-v2')
-except Exception:
-    _ST_MODEL = None
 
-async def call_openai_chat(prompt: str) -> Dict[str, Any]:
+# ----- NO sentence-transformers logic below this line unless needed ------
+
+async def call_groq_chat(prompt: str) -> Dict[str, Any]:
     headers = {
-        'Authorization': f'Bearer {OPENAI_API_KEY}',
+        'Authorization': f'Bearer {GROQ_API_KEY}',
         'Content-Type': 'application/json',
     }
     payload = {
-        'model': 'gpt-4o-mini',
+        'model': 'llama3-8b-8192',   # Groq’s cheapest/fastest model, you can change if needed
         'messages': [
             { 'role': 'system', 'content': 'You are a helpful assistant that extracts job title recommendations from resumes and returns a JSON object.' },
             { 'role': 'user', 'content': prompt }
@@ -28,12 +27,12 @@ async def call_openai_chat(prompt: str) -> Dict[str, Any]:
         'temperature': 0.1,
     }
     async with httpx.AsyncClient(timeout=30.0) as client:
-        r = await client.post(OPENAI_API_URL, headers=headers, json=payload)
+        r = await client.post(GROQ_API_URL, headers=headers, json=payload)
         r.raise_for_status()
         return r.json()
 
 def heuristic_recommend(text: str) -> Dict:
-    tokens = re.findall(r"\\w+", text.lower())
+    tokens = re.findall(r"\w+", text.lower())
     keywords = set(tokens)
     titles = []
     if any(k in keywords for k in ('python', 'django', 'flask')):
@@ -53,15 +52,15 @@ def heuristic_recommend(text: str) -> Dict:
         'recommended_titles': titles,
         'confidence_scores': scores,
         'highlights': highlights,
-        'explanation': 'Heuristic fallback used. Set OPENAI_API_KEY to enable richer LLM output.'
+        'explanation': 'Heuristic fallback used. Set GROQ_API_KEY to enable richer LLM output.'
     }
 
 def _try_parse_json(text: str) -> Any:
-    # try to find a JSON object inside text
+    # Try to find a JSON object inside text
     try:
         return json.loads(text)
     except Exception:
-        # attempt to extract {...} using regex
+        # Attempt to extract {...} using regex
         m = re.search(r"\{.*\}", text, flags=re.S)
         if m:
             try:
@@ -71,15 +70,15 @@ def _try_parse_json(text: str) -> Any:
     return None
 
 async def recommend_jobs_from_text(text: str) -> Dict:
-    # If OpenAI key available, prefer LLM
-    if OPENAI_API_KEY:
+    # If GROQ key available, prefer LLM
+    if GROQ_API_KEY:
         prompt = (
             "Given the following resume text, return a JSON object with keys: 'recommended_titles' (list of strings),"
             " 'confidence_scores' (map title->float between 0 and 1), 'highlights' (list of strings), and 'explanation' (string).\n\n"
             "Resume:\n" + text[:6000]
         )
         try:
-            resp = await call_openai_chat(prompt)
+            resp = await call_groq_chat(prompt)
             assistant_msg = resp['choices'][0]['message']['content']
             parsed = _try_parse_json(assistant_msg)
             if parsed and isinstance(parsed, dict):
@@ -91,29 +90,8 @@ async def recommend_jobs_from_text(text: str) -> Dict:
             else:
                 return heuristic_recommend(text)
         except Exception as e:
-            logging.exception('OpenAI call failed, falling back to heuristic')
+            logging.exception('Groq call failed, falling back to heuristic')
             return heuristic_recommend(text)
     else:
-        base = heuristic_recommend(text)
-        # If embedding model available, expand scores with semantic similarity (optional)
-        if _ST_MODEL is not None:
-            try:
-                titles = base['recommended_titles']
-                # embed resume and titles
-                emb_resume = _ST_MODEL.encode(text, convert_to_tensor=True)
-                emb_titles = _ST_MODEL.encode(titles, convert_to_tensor=True)
-                sims = util.cos_sim(emb_resume, emb_titles)[0]
-                # overwrite scores as normalized similarity
-                import torch
-                sims = sims.cpu().tolist()
-                # normalize to 0.5-0.98 range
-                min_s, max_s = min(sims), max(sims)
-                scores = {}
-                for i, t in enumerate(titles):
-                    raw = sims[i]
-                    norm = 0.5 + 0.48 * ((raw - min_s) / (max_s - min_s + 1e-9))
-                    scores[t] = round(float(norm), 2)
-                base['confidence_scores'] = scores
-            except Exception:
-                pass
-        return base
+        # fallback, works but less powerful
+        return heuristic_recommend(text)
