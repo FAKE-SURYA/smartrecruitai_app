@@ -21,7 +21,6 @@ Upload your resume (PDF, DOCX, or TXT), hit submit, and you’ll get a list of j
 - **No BS UI:** Just upload, see results, done!
 - **Beginner friendly, easy to deploy, clean code**
 
----
-
+----
 
 
