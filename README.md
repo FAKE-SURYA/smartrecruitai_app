@@ -2,8 +2,7 @@
 
 **SmartRecruitAI** is a dead-simple, beginner-friendly web app that lets you upload your resume and instantly get **AI-powered job suggestions**. All built in pure Python (FastAPI) – think of it as your first real tech portfolio project. 🚀
 
-**🌐 Live Demo:**  
-[https://smartrecruitaiapp-production-926c.up.railway.app](https://smartrecruitaiapp-production-926c.up.railway.app)
+
 
 ---
 
